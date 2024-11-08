@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malaria Detection</title>
+    <link rel="stylesheet" href="../static/style.css">   
+</head>
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <div class="ai-fest">AI Fest</div>
+    </div>
+    <div class="header fade-in">
+        <h1>Malaria Detection</h1>
+        <p>
+            Welcome to our website dedicated to advancing malaria detection through cutting-edge technology. In Pakistan, malaria remains a significant public health concern, particularly in underserved communities with limited access to healthcare resources. Conventional diagnostic methods, reliant on manual examination of blood smears, often lead to delays in treatment and higher mortality rates.
+
+            Our initiative focuses on developing a deep learning model capable of automating the detection of malaria-infected cells in blood smear images. By harnessing the power of machine learning, specifically Convolutional Neural Networks (CNNs) and transfer learning techniques, we aim to provide a faster, more accurate, and scalable solution to enhance diagnostic capabilities.
+
+            With guidance from industry experts and leveraging a comprehensive dataset, our project aims to revolutionize malaria diagnosis in Pakistan. Our goal is to empower healthcare providers with a tool that facilitates timely intervention, ultimately improving healthcare outcomes and reducing the burden on healthcare systems.
+
+            Join us as we innovate towards a future where every individual, regardless of location or socioeconomic status, has access to effective malaria diagnosis and treatment.
+        </p>
+    </div>
+    <div class="container">
+        <form id="uploadForm" action="/predict" method="post" enctype="multipart/form-data">
+            <div class="file-input-container">
+                <input type="file" name="file" id="fileInput" accept=".png, .jpg, .jpeg" class="file-input">
+                <label for="fileInput" class="file-input-label">Choose File</label>
+            </div>
+            <div id="previewBox"></div>
+            <div class="button-container">
+                <button type="submit" class="btn">Upload and Predict</button>
+            </div>
+        </form>
+        <div id="resultBox" class="result-box">
+            <!-- Result will be displayed here -->
+        </div>
+    </div>
+    <div class="footer">
+        <p>&copy; 2024 Malaria Detection. All rights reserved.</p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Preview the uploaded image
+            $('#fileInput').change(function(event) {
+                var input = event.target;
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#previewBox').html('<img src="' + e.target.result + '" class="preview-image" />');
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            });
+
+            // Handle the form submission for prediction
+            $('#uploadForm').submit(function(event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Display the result
+                        if (response.result) {
+                            $('#resultBox').html('<p class="result-text">Prediction: ' + response.result + '</p>');
+                        } else {
+                            $('#resultBox').html('<p class="result-text">Error: ' + response.error + '</p>');
+                        }
+                    },
+                    error: function(error) {
+                        console.log(error);
+                        $('#resultBox').html('<p class="result-text">An error occurred. Please try again.</p>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
